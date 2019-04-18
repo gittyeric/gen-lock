@@ -4,10 +4,10 @@ Prioritize independent access to shared resources using ES6 Generators
 
 ### Features
 
-- Transactions based on ES6 Generators for max flexibility & ease
-- Be a complete async traffic cop with 1 function
+- Atomic transactions based on ES6 Generators for max flexibility & ease
+- Be a complete async traffic cop with 1 or 2 functions
 - Auto-resume/restart when transaction locks are lost
-- Extends Redlock algorithm with Priority-based locking
+- Extends Redlock algorithm with Priority-based locking / lock-out
 - Re-entrance supported
 - Hold many locks as one (deadlocks made easy!)
 
@@ -67,7 +67,7 @@ partyModeLock.promise(rainbowsTransaction)
     .catch((err) => console.error('Bulb broke, rainbow time is over :-( ')
 
 // Since the security lock holder has higher priority,
-// the lock will immediately cancel party mode's lock
+// securityLock will immediately cancel party mode's lock
 securityLock.promise(alarmTransaction)
     .then((status) => console.log('Alarm off, bulb status: ' + status))
     .recover((ops) => ops.restart()) // In case a priority > 2 locker comes along!
@@ -76,7 +76,7 @@ securityLock.promise(alarmTransaction)
 // After alarmTransaction completes, we're always back in party mode!
 ```
 
-Note the beauty of code scalability; as long as the priorities and resource guids are previously agreed upon, all of the processes can operate independently of one another.  This allows for large scale systems, especially in JS.
+Note the beauty of code scalability; as long as the priorities and resource IDs are previously agreed upon, all of the processes can operate independently of one another.  This allows for large scale systems, especially in JS.
 
 ### Example 2: Prioritized & Decentralized Queuing
 
@@ -116,7 +116,7 @@ subscription.listenForNewVideo((videoId) => {
             maxAquireAttempts: 1,
         });
     
-    // Start processing with rollback to delete if interrupted
+    // Start processing, if interrupted, rollback by deleting any progress
     locker.promise(processVideo)
         .then(() => processedCount++)
         .recover((recovery) => recovery.replace(rollback))
@@ -147,11 +147,11 @@ maxAquireAttempts: number, // Max number of aquire attempts before giving up (De
 #### lockerFactory(defaultAquireOptions = {}, protocol = undefined) => LockerFactory
 
 Default export of this library. Returns newLocker/newDualLocker functions that default to any [AquireOptions](#AquireOptions) set in this factory function call. The optional
-protocol defaults to an in-memory LockingProtocol for locks scoped to the current Javascript runtime.
+protocol defaults to an in-memory LockingProtocol for locks scoped to the current Javascript runtime.  A Redis-backed protocol for cluster-scoped locks is under development.
 
 #### lockerFactory.newLocker(resourceGuid, resource, defaultAquireOptions = {}, lockerGuid = unique()) => Locker
 
-Creates a new lock holder for a given resource. Lockers can commit Transactions.
+Creates a new lock holder for a given resource. Lockers can promise Transactions.
 You should generally create 1 or more per component / resource pair.  Lockers get a unique guid
 assigned to them by default, but setting them to be equal can be used to acheive re-entrance, allowing
 multiple lockers in a group to hold a lock simultaneously.

@@ -28,23 +28,23 @@ const newRecoveryOptions = (curOptions: DefinedAquireOptions, newOptions?: Aquir
         curOptions
 
 const handleRecovery: (protocol: LockingProtocol) =>
-    <RESOURCE, T>(op: RecoveryOp<RESOURCE, T>, transaction: Transaction<RESOURCE, T>, holder: Locker<RESOURCE>,
+    <RESOURCE, T>(op: RecoveryOp<RESOURCE, T>, transaction: Transaction<RESOURCE, T>, locker: Locker<RESOURCE>,
         resource: RESOURCE, curOptions: DefinedAquireOptions, pendingLockGen: () => Promise<Lock>, checkpoint: Iterator<any>, recoveryCallback?: RecoveryHandler<RESOURCE, T>)
         => Promise<T> =
     (protocol: LockingProtocol) =>
-        <RESOURCE, T>(op: RecoveryOp<RESOURCE, T>, transaction: Transaction<RESOURCE, T>, holder: Locker<RESOURCE>, resource: RESOURCE, curOptions: DefinedAquireOptions,
+        <RESOURCE, T>(op: RecoveryOp<RESOURCE, T>, transaction: Transaction<RESOURCE, T>, locker: Locker<RESOURCE>, resource: RESOURCE, curOptions: DefinedAquireOptions,
             pendingLockGen: () => Promise<Lock>, checkpoint: Iterator<any>, recoveryCallback?: RecoveryHandler<RESOURCE, T>) => {
             if (isResumeOp(op)) {
                 const options = newRecoveryOptions(curOptions, op.newAquireOptions)
-                return runTransaction(protocol)(transaction, holder, resource, options, pendingLockGen, checkpoint, recoveryCallback)
+                return runTransaction(protocol)(transaction, locker, resource, options, pendingLockGen, checkpoint, recoveryCallback)
             }
             else if (isRestartOp(op)) {
                 const options = newRecoveryOptions(curOptions, op.newAquireOptions)
-                return runTransaction(protocol)(transaction, holder, resource, options, pendingLockGen, undefined, recoveryCallback)
+                return runTransaction(protocol)(transaction, locker, resource, options, pendingLockGen, undefined, recoveryCallback)
             }
             else if (isReplaceOp<RESOURCE, T>(op)) {
                 const options = newRecoveryOptions(curOptions, op.newAquireOptions)
-                return runTransaction(protocol)(op.newTransaction, holder, resource, options, pendingLockGen, undefined, recoveryCallback)
+                return runTransaction(protocol)(op.newTransaction, locker, resource, options, pendingLockGen, undefined, recoveryCallback)
             }
             else if (isRejectOp(op)) {
                 return Promise.reject(op.err)
