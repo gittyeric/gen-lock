@@ -149,12 +149,12 @@ maxAquireAttempts: number, // Max number of aquire attempts before giving up (De
 Default export of this library. Returns newLocker/newDualLocker functions that default to any [AquireOptions](#AquireOptions) set in this factory function call. The optional
 protocol defaults to an in-memory LockingProtocol for locks scoped to the current Javascript runtime.
 
-#### lockerFactory.newLocker(resourceGuid, resource, defaultAquireOptions = {}) => Locker
+#### lockerFactory.newLocker(resourceGuid, resource, defaultAquireOptions = {}, lockerGuid = unique()) => Locker
 
 Creates a new lock holder for a given resource. Lockers can commit Transactions.
-You should generally create 1 or more per component / resource pair.  Lockers get a random guid
+You should generally create 1 or more per component / resource pair.  Lockers get a unique guid
 assigned to them by default, but setting them to be equal can be used to acheive re-entrance, allowing
-multiple lockers to hold a lock simultaneously.
+multiple lockers in a group to hold a lock simultaneously.
 
 resourceGuid: string, The string that uniquely and globally identifies this resource
 
