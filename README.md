@@ -201,8 +201,7 @@ handler: The function that receives a [RecoveryOps](#RecoveryOps) object and a L
 When handling a Recovery Op in promise().recover(), your handler _must_ call and return one of the following to guarantee your promise() will complete:
 
 ```
-resume: (newAquireOptions) => ResumeOp, Wait to re-aquire the lock and resume where at the yield the cancelled Transaction 
-left off at! Uses either newAquireOptions or leaving empty to use the previous aquireOptions
+resume: (newAquireOptions) => ResumeOp, Wait to re-aquire the lock and resume the transaction starting from it's last yield statement! Uses either newAquireOptions or leave empty to use the previous aquireOptions
 
 restart: (newAquireOptions) => RestartOp, Wait to re-aquire the lock and re-run the cancelled Transaction from the start.  Uses either newAquireOptions or leave empty to use the previous aquireOptions.
 
