@@ -25,7 +25,7 @@ Let's say you have a function to keep your lights in Party Mode, flashing differ
 // Assume we have some bulb API with an async API
 var bulb = require('...');
 // Create default locker factory scoped to the single JS runtime
-var newLocker = require('gen-lock').lockerFactory();
+var newLocker = require('gen-lock')().newLocker;
 
 // Create 2 lock holders that can lock access to the bulb
 var partyModeLock = newLocker('bath_bulb', bulb);
@@ -87,7 +87,7 @@ Let's say you have many processes listening for new video files uploaded to your
 ```
 // Assume we have some event publisher that dishes out new video IDs:
 var subscription = require('...');
-var newLocker = require('gen-lock').lockerFactory();
+var newLocker = require('gen-lock')().newLocker;
 
 // Transaction to handle a videoId
 function* processVideo(videoId) {
