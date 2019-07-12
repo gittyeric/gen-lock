@@ -1,6 +1,6 @@
 {
   "name": "gen-lock",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Independently coordinate access to shared resources using ES6 Generators",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
