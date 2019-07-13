@@ -58,7 +58,7 @@ const runLoop: (lock: Lock, runningTransaction: Iterator<any>, curIter?: Iterato
         let nextIter: IteratorResult<any> = curIter
         try {
             while (isLockHeld(lock.state()) && !nextIter.done) {
-                nextIter = runningTransaction.next()
+                nextIter = runningTransaction.next(nextIter.value)
                 const curVal = nextIter.value
                 if (isPromise(curVal)) {
                     return runLoop(lock, runningTransaction, { ...nextIter, value: await curVal })
