@@ -7,12 +7,14 @@ const { mergeWithDefaultOptions } = util
 
 // Shortcut for always recovering & resuming on LockErrors (use previous aquireOptions)
 export const alwaysResume = <RESOURCE, T>(commitPromise: CommitPromise<RESOURCE, T>) => {
-    return commitPromise.recover((recovery) => recovery.resume())
+    commitPromise.recover((recovery) => recovery.resume())
+    return commitPromise
 }
 
 // Shortcut for always recovering & restarting on LockErrors (use previous aquireOptions)
 export const alwaysRestart = <RESOURCE, T>(commitPromise: CommitPromise<RESOURCE, T>) => {
-    return commitPromise.recover((recovery) => recovery.restart())
+    commitPromise.recover((recovery) => recovery.restart())
+    return commitPromise
 }
 
 // Combines 2 lockers so that any transaction run requires both locks to be held simultaneously.
