@@ -53,12 +53,18 @@ const handleRecovery: (protocol: LockingProtocol) =>
         }
 
 const runLoop: (lock: Lock, runningTransaction: Iterator<any>, curIter?: IteratorResult<any | Promise<any>>) => Promise<IteratorResult<any>> =
-    async (lock: Lock, runningTransaction: Iterator<any>, curIter: IteratorResult<any | Promise<any>> = ({ done: false, value: undefined })) => {
+    async (lock: Lock, runningTransaction: Iterator<any>, curIter?: IteratorResult<any | Promise<any>>) => {
 
-        let nextIter: IteratorResult<any> = curIter
+        const isFirstIter = !curIter
+        let nextIter: IteratorResult<any> = curIter || { done: false, value: undefined }
         try {
             while (isLockHeld(lock.state()) && !nextIter.done) {
-                nextIter = runningTransaction.next(nextIter.value)
+                if (isFirstIter) {
+                    nextIter = runningTransaction.next()
+                }
+                else {
+                    nextIter = runningTransaction.next(nextIter.value)
+                }
                 const curVal = nextIter.value
                 if (isPromise(curVal)) {
                     return runLoop(lock, runningTransaction, { ...nextIter, value: await curVal })

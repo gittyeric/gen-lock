@@ -26,6 +26,20 @@ describe('genLock', () => {
             expect(res).toBe(2)
         })
     });
+    it('Forwards generator\'s yielded values back into the generator', () => {
+        const factory = lockerFactory()
+        const transaction = function* () {
+            const p1 = yield promiseLastingFor(1).then(() => 1)
+            const p2 = yield promiseLastingFor(1).then(() => 2)
+
+            expect(p2).toBe(2)
+            expect(p1).toBe(1)
+            expect(yield p1).toBe(1)
+        }
+
+        const locker = factory.newLocker('1', '1')
+        return locker.promise(transaction)
+    });
     it('Throws syncronous errors coming from transactions', () => {
         const factory = lockerFactory()
         const intSpy = newIntSpy()
